@@ -1,42 +1,19 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.IOException;
 
 public class MainClient {
-    static String host = "192.168.1.87";
+    static String host = "127.0.0.1";
     static int port = 12345;
-    static String clientInput;
+    static String clientInput = "";
 
-    private static void connectToServer(String host) throws UnknownHostException {
-
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
-            //We create the socket to the other machine/server
-            Socket connectionSocket = new Socket(host, port);
-
-
-            //Looks for the message sent by the server
-            BufferedReader serverIn = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-
-
-            //Just a normal InputStream for the client to write
-            BufferedReader clientIn = new BufferedReader(new InputStreamReader(System.in));
-
-
-            //This is the writer to send text to the server
-            PrintWriter clientOut = new PrintWriter(connectionSocket.getOutputStream(), true);
-
-
-            //Loop for readeing server and sending to server
-            while ((clientInput = clientIn.readLine()) != null) {
-                clientOut.println(clientInput);
-                System.out.println("echo: " + serverIn.readLine());
+            if (ClientServices.connectToServer(host, port)) {
+                while ((clientInput = ComClientHandler.clientIn.readLine()) != null) {
+                    ComClientHandler.clientOut.println(clientInput);
+                    System.out.println("Server: " + ComClientHandler.serverIn.readLine());
+                    if (ComClientHandler.serverIn.readLine().equals("Bye!")) System.exit(1);
+                }
             }
-
         } catch (Exception e) {
             System.out.println("Error 1");
         }
